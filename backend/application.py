@@ -209,7 +209,7 @@ def create_app(config=None):
         return redirect(url_for('dashboard' if g.user and g.user.perfil == 'Professor' else ('home' if g.user else 'login')))
 
     @app.route('/login', methods=['GET', 'POST'])
-    @csrf.exempt
+    
     def login():
         if request.method == 'GET':
             return render_template('login.html', mode=request.args.get('mode', 'login'), full_width=True)
@@ -236,7 +236,7 @@ def create_app(config=None):
         return redirect(url_for('dashboard' if user.perfil == 'Professor' else 'home'), code=303)
 
     @app.route('/register', methods=['GET', 'POST'])
-    @csrf.exempt
+    
     def register():
         if request.method == 'GET':
             return render_template('login.html', mode='register', full_width=True)
@@ -270,7 +270,7 @@ def create_app(config=None):
         return redirect(url_for('login'), code=303)
 
     @app.route('/recuperar-senha', methods=['GET', 'POST'])
-    @csrf.exempt
+    
     def recuperar_senha():
         if request.method == 'POST':
             auth_limit()
@@ -287,7 +287,7 @@ def create_app(config=None):
         return render_template('recuperar_senha.html')
 
     @app.route('/nova-senha', methods=['GET', 'POST'])
-    @csrf.exempt
+    
     def nova_senha():
         if request.method == 'POST':
             auth_limit()
