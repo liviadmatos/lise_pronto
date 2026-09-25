@@ -55,6 +55,12 @@ def create_app(config=None):
     )
     if config:
         app.config.update(config)
+    base_url = (app.config.get('APP_BASE_URL') or '').lower()
+    secure_cookie = bool(app.config.get('SESSION_COOKIE_SECURE', False))
+    if base_url.startswith('http://') and any(host in base_url for host in ('localhost', '127.0.0.1', '0.0.0.0')):
+        secure_cookie = False
+    app.config['SESSION_COOKIE_SECURE'] = secure_cookie
+    app.config['COOKIE_SECURE'] = secure_cookie
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 32 or app.config['SECRET_KEY'].startswith('SUBSTITUA'):
         raise RuntimeError('Defina SECRET_KEY com pelo menos 32 caracteres aleatórios. Consulte o README.')
     db_url = app.config['DATABASE_URL']

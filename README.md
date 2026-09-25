@@ -93,7 +93,7 @@ Adicione uma variável por linha. Não coloque aspas em volta dos valores.
 | `SUPABASE_URL` | `https://xlqtonspstoqidssioxn.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | A chave **publishable** do projeto Lise; a chave **anon** legada também é aceita |
 | `APP_BASE_URL` | A URL HTTPS exata atribuída pelo Render, sem barra no final |
-| `COOKIE_SECURE` | `true` |
+| `COOKIE_SECURE` | `true` em HTTPS/Render; use `false` para desenvolvimento local em `http://127.0.0.1:5000` |
 | `PROXY_HOPS` | `1` |
 | `DEMO_MODE` | `false` |
 

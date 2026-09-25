@@ -53,6 +53,13 @@ def answer(app, client, ident, token, correct=True):
     return client.post(f'/partidas/{ident}/responder', data={'csrf_token':token,key:value if correct else '99999','xp_earned':'999999','correct':'true'})
 
 
+def test_local_http_does_not_force_secure_session_cookie():
+    local_app = create_app({'TESTING': True, 'DEMO_MODE': True, 'DATABASE_URL': 'sqlite:///:memory:', 'SECRET_KEY': 'test-secret-with-more-than-thirty-two-characters', 'SESSION_COOKIE_SECURE': True, 'APP_BASE_URL': 'http://127.0.0.1:5000'})
+    assert local_app.config['SESSION_COOKIE_SECURE'] is False
+    https_app = create_app({'TESTING': True, 'DEMO_MODE': True, 'DATABASE_URL': 'sqlite:///:memory:', 'SECRET_KEY': 'test-secret-with-more-than-thirty-two-characters', 'SESSION_COOKIE_SECURE': True, 'APP_BASE_URL': 'https://lise.onrender.com'})
+    assert https_app.config['SESSION_COOKIE_SECURE'] is True
+
+
 def test_pages_and_auth(app):
     c=app.test_client()
     assert c.get('/home').status_code == 302
