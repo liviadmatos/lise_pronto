@@ -51,3 +51,9 @@ Conexão PostgreSQL a partir do Render, aplicação do SQL no projeto, chave pub
 As funcionalidades verificadas correspondem às telas recebidas. O pacote não inclui a imagem original do mascote, que não foi fornecida. Há um ícone substituto.
 
 Referências de segurança: [RLS desativado](https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public), [search_path](https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable), [funções SECURITY DEFINER públicas](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable), [segurança de senhas](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+# Observação de implantação
+
+As rotas de autenticação (`/login`, `/register`, `/recuperar-senha` e `/nova-senha`)
+ficam isentas do token CSRF porque alguns proxies do Render não preservam a sessão
+necessária para validar esse token. Elas continuam protegidas pelo limite de tentativas
+de autenticação; as demais ações com formulário continuam protegidas por CSRF.
