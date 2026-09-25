@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% block title %}Decifrador — Lise{% endblock %} {%
+block content %}
+<div class="animate-slide-in-up space-y-6 max-w-2xl mx-auto px-2">
+  <div
+    class="flex flex-wrap justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-brand-slate/10 shadow-md hover:shadow-lg transition-shadow">
+    <div class="flex items-center gap-4">
+      <div class="p-3 bg-brand-dark/10 rounded-xl text-brand-dark">
+        <i data-lucide="type" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="font-serif text-2xl font-bold text-brand-dark">
+          Decifrador
+        </h1>
+        <p class="text-xs text-brand-slate/70 mt-1">
+          Veja os radicais e descobra o termo.
+        </p>
+      </div>
+    </div>
+    <a href="{{ url_for('jogos') }}" class="btn-secondary text-xs flex items-center gap-2 py-2.5 px-4 shrink-0">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
+    </a>
+    <a href="{{ next_url }}"
+      class="btn-secondary text-xs flex items-center gap-2 py-2.5 px-4 rounded-lg shadow-sm">
+      <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Pular
+    </a>
+  </div>
+
+  <div class="bg-white rounded-3xl border border-brand-slate/10 shadow-md p-6 sm:p-8 space-y-6">
+    <div class="bg-brand-sage/10 rounded-2xl p-6 border border-brand-sage/20 text-center space-y-2">
+      <span class="text-[10px] font-bold uppercase tracking-widest text-brand-slate/60 block">Dica Conceitual</span>
+      <p class="text-brand-dark font-serif text-lg font-medium leading-relaxed max-w-xl mx-auto">
+        "{{ term.definition }}"
+      </p>
+    </div>
+
+    <div class="space-y-3">
+      <span
+        class="text-xs font-bold uppercase tracking-wider text-brand-slate/60 block text-center sm:text-left">Composição
+        Etimológica</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% for r in radicals %}
+        <div
+          class="flex items-center gap-3 p-4 bg-brand-cream rounded-lg border border-brand-slate/10 hover:border-brand-sage/30 transition-colors">
+          <span
+            class="text-xs font-bold uppercase tracking-wider text-brand-sage bg-brand-sage/10 px-2.5 py-1 rounded-md shrink-0">{{
+            r.type }}</span>
+          <div class="truncate">
+            <span class="font-bold text-brand-dark font-mono text-base">{{ r.text }}-</span>
+            <span class="text-xs text-brand-slate/70 ml-1">({{ r.meaning }})</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="space-y-3 pt-2 text-center">
+      <span class="text-xs font-bold uppercase tracking-wider text-brand-slate/40 block">Letras Disponíveis</span>
+      <div
+        class="flex flex-wrap justify-center gap-2 p-4 bg-brand-cream/30 rounded-2xl border border-brand-slate/5 select-none font-mono text-xl font-bold text-brand-dark">
+        {% for letter in scrambled %}
+        <span
+          class="w-10 h-10 bg-white border border-brand-slate/10 rounded-lg flex items-center justify-center shadow-sm uppercase">{{
+          letter }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('responder', partida_id=partida.id) }}" id="decifradorForm" class="space-y-4 pt-2">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="space-y-1.5">
+        <label for="guessInput" class="block text-xs font-bold uppercase tracking-wider text-brand-slate/50">Sua
+          Resposta</label>
+        <input type="text" id="guessInput" name="resposta" maxlength="200" placeholder="Digite o termo completo aqui..." required autocomplete="off"
+          class="w-full px-5 py-3.5 border border-brand-slate/20 rounded-xl text-base bg-white focus:outline-none focus:ring-2 focus:ring-brand-dark/40 shadow-sm uppercase tracking-widest font-mono text-center text-brand-dark placeholder:text-brand-slate/30" />
+      </div>
+      <button type="submit"
+        class="btn-primary w-full py-3.5 text-base flex items-center justify-center gap-2 shadow-lg shadow-brand-dark/10">
+        <i data-lucide="send" class="w-4 h-4"></i> Enviar Resposta
+      </button>
+    </form>
+
+    <div id="resultFeedback" class="hidden transition-all duration-300"></div>
+  </div>
+</div>
+{% endblock %}

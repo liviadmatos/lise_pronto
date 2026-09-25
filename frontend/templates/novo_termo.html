@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Adicionar termo — LISE{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+<a class="btn-outline" href="{{ url_for('dashboard') }}">Voltar ao painel</a>
+<div class="card space-y-4">
+<h1 class="font-serif text-3xl text-brand-dark">Termo para minhas turmas</h1>
+<p>O termo fica disponível para você e para os alunos das turmas selecionadas.</p>
+{% if turmas and areas %}
+<form method="POST" class="space-y-5">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label class="block">Palavra completa<input name="palavra" maxlength="200" required class="w-full border rounded-lg p-3" placeholder="Ex.: Biologia"></label>
+<label class="block">Definição biológica<textarea name="definicao" maxlength="5000" required rows="3" class="w-full border rounded-lg p-3"></textarea></label>
+<label class="block">Área<select name="area_id" required class="w-full border rounded-lg p-3">{% for a in areas %}<option value="{{ a.id_area }}">{{ a.nome }}</option>{% endfor %}</select></label>
+<fieldset class="border rounded-lg p-4"><legend>Turmas que terão acesso</legend>{% for t in turmas %}<label class="block py-2"><input type="checkbox" name="turmas" value="{{ t.id_turma }}"> {{ t.nome }}</label>{% endfor %}</fieldset>
+<label class="block">Radicais na ordem da palavra<textarea name="radicais" required rows="5" maxlength="6000" class="w-full border rounded-lg p-3 font-mono text-sm" placeholder="bio | vida | RADICAL&#10;logia | estudo | SUFIXO"></textarea></label>
+<p class="text-sm">Uma linha por parte: texto | significado | classificação. Classificações aceitas: PREFIXO, RADICAL e SUFIXO. Partes repetidas podem ser inseridas em linhas diferentes.</p>
+<button class="btn-primary">Salvar termo</button>
+</form>
+{% else %}<p>Crie uma turma e cadastre pelo menos uma área no banco antes de adicionar termos.</p>{% endif %}
+</div></div>
+{% endblock %}

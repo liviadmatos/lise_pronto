@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}Montagem — Lise{% endblock %}
+{% block content %}
+<div class="animate-slide-in-up space-y-6 max-w-3xl mx-auto">
+
+    <div
+        class="flex flex-wrap justify-between items-center gap-4 bg-white rounded-2xl p-6 border border-brand-slate/10 shadow-md hover:shadow-lg transition-shadow">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-brand-sage/10 rounded-xl text-brand-sage">
+                <i data-lucide="puzzle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="font-serif text-2xl font-bold text-brand-dark">Jogo de Montagem</h1>
+                <p class="text-xs text-brand-slate/70 mt-1">Selecione os radicais corretos para montar o termo.</p>
+            </div>
+        </div>
+        <div class="flex gap-2 items-center">
+            <form method="GET" class="flex gap-2">{% if vinculo_id %}<input type="hidden" name="vinculo_id" value="{{ vinculo_id }}">{% endif %}
+                <select name="area" onchange="this.form.submit()"
+                    class="px-4 py-2.5 border border-brand-slate/20 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 font-medium transition-all hover:border-brand-sage text-brand-dark">
+                    <option value="">Todas as Áreas</option>
+                    {% for a in areas %}
+                    <option value="{{ a }}" {% if a==area_selecionada %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            <a href="{{ url_for('jogos') }}" class="btn-secondary text-xs flex items-center gap-2 py-2.5 px-4 shrink-0">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="relative overflow-hidden rounded-3xl p-8 text-white text-center
+            bg-gradient-to-br from-[#1B4332] via-[#24563F] to-[#163528]
+            shadow-xl border border-[#52B788]/30">
+
+        <!-- Brilhos decorativos -->
+        <div class="absolute -top-20 -right-20 w-48 h-48
+                rounded-full bg-[#52B788]/20 blur-3xl"></div>
+
+        <div class="absolute -bottom-24 -left-16 w-56 h-56
+                rounded-full bg-[#D4A72C]/10 blur-3xl"></div>
+
+        <!-- Formas decorativas -->
+        <div class="absolute top-0 right-0 w-32 h-32
+                bg-[#52B788]/10 rounded-bl-[100px]"></div>
+
+        <div class="absolute bottom-0 left-0 w-28 h-28
+                bg-black/10 rounded-tr-[90px]"></div>
+
+        <div class="relative z-10">
+
+            <!-- Badge -->
+            <span class="inline-flex items-center gap-2
+                   px-4 py-2 mb-5
+                   rounded-full
+                   bg-[#D4A72C]/15
+                   border border-[#D4A72C]/40
+                   text-[#E8C766]
+                   text-xs font-bold tracking-widest uppercase">
+
+                <span class="relative flex w-2 h-2">
+                    <span class="absolute w-full h-full rounded-full
+                             bg-[#D4A72C] opacity-60 animate-ping"></span>
+
+                    <span class="relative w-2 h-2 rounded-full bg-[#D4A72C]"></span>
+                </span>
+
+                Definição Biológica
+            </span>
+
+            <!-- Definição -->
+            <p class="max-w-3xl mx-auto
+                  text-xl md:text-2xl
+                  font-serif font-medium
+                  leading-relaxed
+                  drop-shadow-lg">
+
+                "{{ term.definition }}"
+
+            </p>
+
+            <!-- Separador -->
+            <div class="flex items-center justify-center gap-3 my-6">
+
+                <div class="w-12 h-px bg-[#52B788]/50"></div>
+
+                <i data-lucide="dna" class="w-5 h-5 text-[#D4A72C]"></i>
+
+                <div class="w-12 h-px bg-[#52B788]/50"></div>
+
+            </div>
+
+            <!-- Área -->
+            <div class="inline-flex items-center gap-2
+                    px-4 py-2
+                    rounded-xl
+                    bg-black/15
+                    border border-white/10">
+
+                <i data-lucide="map-pin" class="w-4 h-4 text-[#D4A72C]"></i>
+
+                <span class="text-white/60 text-xs
+                         uppercase tracking-widest font-semibold">
+                    Área:
+                </span>
+
+                <span class="text-white text-xs
+                         uppercase tracking-wider font-bold">
+                    {{ term.area }}
+                </span>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card bg-white">
+        <div class="flex justify-between items-end mb-3">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Sua Montagem:</p>
+            <p class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Arraste ou clique</p>
+        </div>
+
+        <div id="dropZone"
+            class="min-h-[100px] border-2 border-dashed border-brand-salvia/40 rounded-2xl p-4 flex flex-wrap gap-3 items-center bg-gray-50/50 transition-all duration-300"
+            ondragover="allowDrop(event)" ondrop="drop(event)">
+            <p id="dropHint" class="text-gray-400 text-sm w-full text-center animate-pulse">Arraste os pedaços para cá →
+            </p>
+        </div>
+    </div>
+
+    <div>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 pl-2">Pedaços Disponíveis:</p>
+        <div id="optionsZone" class="flex flex-wrap gap-3 p-2">
+            {% for opt in options %}
+            <div id="rad-{{ opt.id }}" draggable="true" ondragstart="drag(event)" onclick="toggleSelect('{{ opt.id }}')"
+                data-id="{{ opt.id }}" data-text="{{ opt.text }}"
+                class="radical-chip cursor-grab active:cursor-grabbing select-none px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-brand-dark hover:border-brand-salvia hover:shadow-md transition-all">
+                <span class="text-brand-dark font-bold pointer-events-none">{{ opt.text }}-</span>
+                <span class="text-brand-slate/60 text-[11px] ml-1.5 font-normal pointer-events-none">{{ opt.meaning
+                    }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="flex gap-3 flex-wrap">
+        <button id="checkBtn" onclick="checkAnswer()"
+            class="btn-primary flex-1 py-3 text-base shadow-lg shadow-brand-musgo/20"> <i data-lucide="check"></i>
+            Validar
+            Montagem</button>
+        <a href="{{ next_url }}"
+            class="btn-secondary flex-none px-6 py-3 text-center shadow-sm"><i data-lucide="rotate-ccw"></i> Pular</a>
+    </div>
+
+    <div id="resultado"
+        class="hidden rounded-2xl p-6 text-center shadow-lg transition-all transform scale-95 opacity-0"></div>
+
+</div>
+
+<form id="answerForm" method="POST" action="{{ url_for('responder', partida_id=partida.id) }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input type="hidden" name="ordem" id="ordem">
+</form>
+<script>
+    let selectedInDrop = [];
+
+    // ==========================================
+    // 2. Sistema de Drag and Drop (Arrastar)
+    // ==========================================
+    function allowDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.add('border-brand-salvia', 'bg-brand-salvia/5');
+    }
+
+    document.getElementById('dropZone').addEventListener('dragleave', () => {
+        document.getElementById('dropZone').classList.remove('border-brand-salvia', 'bg-brand-salvia/5');
+    });
+
+    function drag(e) {
+        e.dataTransfer.setData('text', e.target.id);
+    }
+
+    function drop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.remove('border-brand-salvia', 'bg-brand-salvia/5');
+
+        const id = e.dataTransfer.getData('text');
+        const el = document.getElementById(id);
+
+        if (!el || el.closest('#dropZone')) return;
+
+        document.getElementById('dropHint').style.display = 'none';
+
+        el.classList.add('border-brand-musgo', 'bg-brand-musgo/10');
+        el.classList.remove('border-gray-200');
+        el.draggable = false;
+        el.onclick = () => removeFromDrop(id, el);
+
+        // Alvo seguro: cria o botão apenas se ele já não existir lá dentro
+        if (!el.querySelector('.btn-remover')) {
+            const removeBtn = document.createElement('span');
+            removeBtn.innerHTML = '<svg class="w-3 h-3 inline ml-2 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+            removeBtn.className = 'btn-remover text-red-400 cursor-pointer hover:text-red-600 transition-colors bg-white/50 rounded-full p-0.5';
+            removeBtn.onclick = (event) => {
+                event.stopPropagation(); // Evita disparar cliques indesejados no container pai
+                removeFromDrop(id, el);
+            };
+            el.appendChild(removeBtn);
+        }
+
+        document.getElementById('dropZone').appendChild(el);
+
+        if (!selectedInDrop.includes(el.dataset.id)) {
+            selectedInDrop.push(el.dataset.id);
+        }
+    }
+
+    function removeFromDrop(domId, el) {
+        // Alvo seguro: remove estritamente o botão que tem a classe CSS que definimos
+        const existingBtn = el.querySelector('.btn-remover');
+        if (existingBtn) {
+            el.removeChild(existingBtn);
+        }
+
+        el.classList.remove('border-brand-musgo', 'bg-brand-musgo/10');
+        el.classList.add('border-gray-200');
+        el.draggable = true;
+        el.onclick = () => toggleSelect(el.dataset.id);
+
+        document.getElementById('optionsZone').appendChild(el);
+        selectedInDrop = selectedInDrop.filter(x => x !== el.dataset.id);
+
+        if (document.getElementById('dropZone').querySelectorAll('.radical-chip').length === 0)
+            document.getElementById('dropHint').style.display = '';
+    }
+
+    // ==========================================
+    // 3. Sistema de Clique (Mobile Friendly)
+    // ==========================================
+    function toggleSelect(id) {
+        const el = document.getElementById('rad-' + id);
+        if (el.closest('#dropZone')) return;
+
+        drop({ preventDefault: () => { }, dataTransfer: { getData: () => 'rad-' + id } });
+    }
+
+    // ==========================================
+    // A solução permanece no servidor.
+    function checkAnswer() {
+      if (!selectedInDrop.length) { alert('Selecione os radicais na ordem desejada.'); return; }
+      document.getElementById('ordem').value = selectedInDrop.join(',');
+      document.getElementById('checkBtn').disabled = true;
+      document.getElementById('answerForm').requestSubmit();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Flashcards — LISE{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+  <div class="card flex flex-wrap justify-between items-center gap-4">
+    <div><h1 class="text-3xl font-serif text-brand-dark">Flashcards</h1><p>{{ restantes }} revisão(ões) disponível(is)</p></div>
+    <a href="{{ url_for('jogos') }}" class="btn-secondary">Voltar</a>
+    <form method="GET"><label for="area">Área</label><select id="area" name="area" onchange="this.form.submit()" class="border rounded-lg p-2"><option value="">Todas</option>{% for a in areas %}<option {% if a == area_selecionada %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></form>
+  </div>
+  <div class="card text-center py-12 space-y-6">
+    <span class="text-sm text-brand-sage">{{ term.area }}</span>
+    <h2 class="text-4xl font-serif text-brand-dark">{{ term.name }}</h2>
+    <p>Tente lembrar o significado antes de revelar a resposta.</p>
+    <button type="button" id="reveal" class="btn-primary">Revelar significado</button>
+    <div id="back" class="hidden space-y-4" aria-live="polite">
+      <p class="text-xl">{{ term.definition }}</p>
+      {% for r in term.radical_list %}<p><strong>{{ r.text }}</strong> — {{ r.meaning }}</p>{% endfor %}
+      <form method="POST" action="{{ url_for('responder', partida_id=partida.id) }}" class="flex flex-wrap justify-center gap-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button name="acertou" value="nao" class="btn-outline">Preciso revisar (1 hora)</button>
+        <button name="acertou" value="sim" class="btn-primary">Lembrei (3 dias)</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script>document.getElementById('reveal').addEventListener('click', function () {this.hidden = true; document.getElementById('back').classList.remove('hidden');});</script>
+{% endblock %}

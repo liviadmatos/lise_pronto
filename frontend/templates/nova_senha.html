@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card max-w-md mx-auto my-12 space-y-5"><h1 class="font-serif text-3xl text-brand-dark">Nova senha</h1>
+{% if token_hash %}<form method="POST" class="space-y-4"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="token_hash" value="{{ token_hash }}"><label class="block">Senha<input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password" class="w-full border rounded-lg p-3"></label><label class="block">Confirmar senha<input type="password" name="confirm_password" required minlength="8" maxlength="128" autocomplete="new-password" class="w-full border rounded-lg p-3"></label><button class="btn-primary">Atualizar senha</button></form>{% else %}<p>Abra o link recebido por e-mail. Se ele expirou, solicite outro.</p><a class="btn-primary" href="{{ url_for('recuperar_senha') }}">Solicitar link</a>{% endif %}</div>
+{% endblock %}

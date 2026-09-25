@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: lise-flask
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.lock
+    startCommand: bash start.sh
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.14
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: PROXY_HOPS
+        value: "1"
+      - key: DEMO_MODE
+        value: "false"

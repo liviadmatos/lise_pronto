@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+{% set full_width = true %}
+
+{% block title %}Acesso e Cadastro — Lise{% endblock %}
+
+{% block head %}
+<style>
+    /* ── Estilos de Animação do Double Slider ────────────────────────── */
+    .auth-form-container {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        transition: all 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .sign-in-container {
+        left: 0;
+        width: 50%;
+        z-index: 2;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    #auth-container.right-panel-active .sign-in-container {
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .sign-up-container {
+        left: 0;
+        width: 50%;
+        opacity: 0;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    #auth-container.right-panel-active .sign-up-container {
+        transform: translateX(100%);
+        opacity: 1;
+        z-index: 5;
+        pointer-events: auto;
+        animation: showSignUp 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    @keyframes showSignUp {
+
+        0%,
+        49.99% {
+            opacity: 0;
+            z-index: 1;
+        }
+
+        50%,
+        100% {
+            opacity: 1;
+            z-index: 5;
+        }
+    }
+
+    /* Overlay Deslizante */
+    .overlay-container {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        overflow: hidden;
+        transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        z-index: 20;
+    }
+
+    #auth-container.right-panel-active .overlay-container {
+        transform: translateX(-100%);
+    }
+
+    .overlay {
+        background: linear-gradient(135deg, #2D3A30 0%, #4A5D4E 50%, #3D4F41 100%);
+        position: relative;
+        left: -100%;
+        height: 100%;
+        width: 200%;
+        transform: translateX(0);
+        transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    #auth-container.right-panel-active .overlay {
+        transform: translateX(50%);
+    }
+
+    .overlay-panel {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-direction: column;
+        padding: 1.5rem;
+        text-align: center;
+        top: 0;
+        height: 100%;
+        width: 50%;
+        transform: translateX(0);
+        transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    /* Estágio do Mascote Background */
+    .mascot-stage {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-bottom: 2rem;
+    }
+
+    .mascot-image {
+        width: 105%;
+        height: 105%;
+        object-fit: contain;
+        object-position: center 25%;
+        filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+    }
+
+    /* Card Glassmorphism Sobreposto */
+    .overlay-content-card {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        max-width: 22rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 1.5rem;
+        background: rgba(22, 33, 25, 0.55);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+    }
+
+    .overlay-left {
+        transform: translateX(-20%);
+    }
+
+    #auth-container.right-panel-active .overlay-left {
+        transform: translateX(0);
+    }
+
+    .overlay-right {
+        right: 0;
+        transform: translateX(0);
+    }
+
+    #auth-container.right-panel-active .overlay-right {
+        transform: translateX(20%);
+    }
+
+    /* Responsivo Mobile (< 768px) */
+    @media (max-width: 767px) {
+        .overlay-container {
+            display: none !important;
+        }
+
+        .auth-form-container {
+            position: relative !important;
+            width: 100% !important;
+            height: auto !important;
+            transform: none !important;
+            opacity: 1 !important;
+            display: none;
+        }
+
+        #auth-container:not(.right-panel-active) .sign-in-container {
+            display: block !important;
+            pointer-events: auto !important;
+        }
+
+        #auth-container.right-panel-active .sign-up-container {
+            display: block !important;
+            pointer-events: auto !important;
+            animation: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section
+    class="relative min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-brand-cream/40 overflow-hidden select-none py-8">
+
+    <!-- Elementos de Fundo Orgânicos Decorativos -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none">
+        <div
+            class="absolute -top-24 -left-24 w-[450px] sm:w-[600px] h-[450px] sm:h-[600px] bg-brand-sage/20 rounded-full blur-[120px]">
+        </div>
+        <div
+            class="absolute -bottom-24 -right-24 w-[450px] sm:w-[600px] h-[450px] sm:h-[600px] bg-brand-sage/25 rounded-full blur-[120px]">
+        </div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-brand-cream/60 rounded-full blur-[140px]">
+        </div>
+        <i data-lucide="leaf"
+            class="absolute top-8 left-8 sm:top-12 sm:left-14 w-16 h-16 sm:w-24 sm:h-24 text-brand-sage/20 -rotate-45"></i>
+        <i data-lucide="leaf" class="absolute top-1/3 left-4 sm:left-10 w-12 h-12 text-brand-sage/15 rotate-12"></i>
+        <i data-lucide="leaf"
+            class="absolute bottom-8 right-8 sm:bottom-12 sm:right-14 w-20 h-20 sm:w-28 sm:h-28 text-brand-sage/20 rotate-45"></i>
+        <i data-lucide="leaf" class="absolute top-10 right-1/4 w-10 h-10 text-brand-sage/10 -rotate-12"></i>
+    </div>
+
+    <!-- Container Principal do Double Slider -->
+    <div id="auth-container"
+        class="relative z-10 w-full max-w-4xl min-h-[620px] md:min-h-[650px] bg-white/95 backdrop-blur-md rounded-[2.5rem] shadow-2xl border border-white/80 overflow-hidden {% if mode == 'register' %}right-panel-active{% endif %}">
+
+        <!-- ── FORMULÁRIO 1: CADASTRO (Sign Up) ────────────────────────────── -->
+        <div class="auth-form-container sign-up-container flex flex-col justify-center px-6 sm:px-10 md:px-12 py-8">
+
+            <!-- Alternador Mobile Superior -->
+            <div
+                class="md:hidden flex items-center justify-center p-1 bg-brand-cream/80 rounded-2xl border border-brand-slate/15 mb-4 max-w-xs mx-auto w-full">
+                <button type="button" onclick="setAuthMode('login')"
+                    class="flex-1 py-1.5 text-xs font-bold rounded-xl text-brand-slate/70 transition-all">Entrar</button>
+                <button type="button"
+                    class="flex-1 py-1.5 text-xs font-bold rounded-xl bg-brand-sage text-white shadow-sm transition-all">Cadastrar</button>
+            </div>
+
+            <div class="text-center mb-5">
+                <div
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-cream/80 text-brand-sage mb-2 border border-brand-sage/20 shadow-inner">
+                    <i data-lucide="user-plus" class="w-6 h-6 text-brand-sage"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-brand-dark tracking-tight">Crie sua conta</h2>
+                <p class="text-xs sm:text-sm text-brand-slate/70 mt-1 font-medium">Junte-se à nossa comunidade de
+                    aprendizado.</p>
+            </div>
+
+            <form id="registerForm" method="POST" action="{{ url_for('register') }}" class="space-y-3">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <!-- Nome -->
+                <div>
+                    <label for="reg-name"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">Nome
+                        Completo</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="user"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors"></i>
+                        <input type="text" name="name" id="reg-name" required autocomplete="name"
+                            placeholder="Seu nome completo"
+                            class="w-full pl-10 pr-4 py-2.5 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm placeholder-brand-slate/40 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                    </div>
+                </div>
+
+                <!-- E-mail -->
+                <div>
+                    <label for="reg-email"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">E-mail</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="mail"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors"></i>
+                        <input type="email" name="email" id="reg-email" required autocomplete="email"
+                            placeholder="seu@email.com"
+                            class="w-full pl-10 pr-4 py-2.5 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm placeholder-brand-slate/40 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div>
+                    <label for="reg-password"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">Senha</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="key-round"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors"></i>
+                        <input type="password" name="password" id="reg-password" required minlength="8"
+                            autocomplete="new-password" placeholder="Mínimo 8 caracteres"
+                            class="w-full pl-10 pr-10 py-2.5 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm placeholder-brand-slate/40 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                        <button type="button" onclick="togglePasswordVisibility('reg-password', 'regToggleIcon')"
+                            class="absolute right-3 text-brand-slate/40 hover:text-brand-dark focus:outline-none">
+                            <i data-lucide="eye" id="regToggleIcon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tipo de Conta -->
+                <div>
+                    <label for="reg-role"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">Tipo de
+                        Conta</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="graduation-cap"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors pointer-events-none"></i>
+                        <select name="role" id="reg-role"
+                            class="w-full pl-10 pr-8 py-2.5 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium appearance-none cursor-pointer">
+                            <option value="ALUNO">Aluno (Aprender Biologia)</option>
+                            <option value="PROFESSOR">Professor (Gerenciar Turmas)</option>
+                        </select>
+                        <i data-lucide="chevron-down"
+                            class="w-4 h-4 absolute right-3.5 text-brand-slate/40 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Botão Submit -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full py-3 px-4 rounded-2xl shadow-md shadow-brand-dark/25 text-sm font-bold text-white bg-brand-dark hover:bg-brand-petroleo hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>Criar Conta</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+
+            
+
+            <!-- Alternador Mobile no Rodapé -->
+            <div
+                class="md:hidden mt-4 pt-3 border-t border-brand-slate/10 text-center text-xs text-brand-slate/70 font-medium">
+                Já tem uma conta?
+                <button type="button" onclick="setAuthMode('login')"
+                    class="font-bold text-brand-sage hover:underline ml-1">Faça login</button>
+            </div>
+        </div>
+
+        <!-- ── FORMULÁRIO 2: LOGIN (Sign In) ───────────────────────────────── -->
+        <div class="auth-form-container sign-in-container flex flex-col justify-center px-6 sm:px-10 md:px-12 py-8">
+
+            <!-- Alternador Mobile Superior -->
+            <div
+                class="md:hidden flex items-center justify-center p-1 bg-brand-cream/80 rounded-2xl border border-brand-slate/15 mb-4 max-w-xs mx-auto w-full">
+                <button type="button"
+                    class="flex-1 py-1.5 text-xs font-bold rounded-xl bg-brand-sage text-white shadow-sm transition-all">Entrar</button>
+                <button type="button" onclick="setAuthMode('register')"
+                    class="flex-1 py-1.5 text-xs font-bold rounded-xl text-brand-slate/70 transition-all">Cadastrar</button>
+            </div>
+
+            <div class="text-center mb-6">
+                <div
+                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-cream/80 text-brand-sage mb-2 border border-brand-sage/20 shadow-inner">
+                    <i data-lucide="log-in" class="w-6 h-6 text-brand-sage"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-brand-dark tracking-tight">Bem-vindo(a) de
+                    volta!</h2>
+                <p class="text-left text-xs sm:text-sm text-brand-slate mt-1 font-medium">Acesse sua conta para
+                    continuar
+                    aprendendo.</p>
+            </div>
+
+            <form id="loginForm" method="POST" action="{{ url_for('login') }}" class="space-y-4">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <!-- E-mail -->
+                <div>
+                    <label for="login-email"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">E-mail</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="mail"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors"></i>
+                        <input type="email" name="email" id="login-email" required autocomplete="email"
+                            placeholder="seu@email.com"
+                            class="w-full pl-10 pr-4 py-3 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm placeholder-brand-slate/40 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div>
+                    <label for="login-password"
+                        class="block text-xs font-bold text-brand-dark/80 uppercase tracking-wider mb-1 ml-1">Senha</label>
+                    <div class="relative flex items-center group">
+                        <i data-lucide="key-round"
+                            class="w-4 h-4 absolute left-3.5 text-brand-slate/40 group-focus-within:text-brand-sage transition-colors"></i>
+                        <input type="password" name="password" id="login-password" required
+                            autocomplete="current-password" placeholder="••••••••"
+                            class="w-full pl-10 pr-10 py-3 bg-brand-cream/20 border border-brand-slate/20 rounded-2xl text-brand-dark text-xs sm:text-sm placeholder-brand-slate/40 transition-all focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                        <button type="button" onclick="togglePasswordVisibility('login-password', 'loginToggleIcon')"
+                            class="absolute right-3 text-brand-slate/40 hover:text-brand-dark focus:outline-none">
+                            <i data-lucide="eye" id="loginToggleIcon" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lembrar e Esqueci Senha -->
+                <div class="flex items-center justify-between text-xs pt-1">
+                    <label for="remember_me"
+                        class="flex items-center gap-2 cursor-pointer text-brand-slate font-medium select-none py-2 px-1 -ml-1">
+                        <input id="remember_me" name="remember_me" type="checkbox"
+                            class="w-4 h-4 text-brand-sage border-brand-slate/30 rounded-lg focus:ring-brand-sage/40 cursor-pointer accent-brand-sage">
+                        Lembrar de mim
+                    </label>
+                    <a href="{{ url_for('recuperar_senha') }}"
+                        class="font-semibold text-brand-slate hover:text-brand-dark transition-colors py-2 px-1 -mr-1">Esqueceu
+                        a
+                        senha?</a>
+                </div>
+
+                <!-- Botão Submit -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full py-3.5 px-4 rounded-2xl shadow-md shadow-brand-dark/25 text-sm font-bold text-white bg-brand-dark hover:bg-brand-petroleo hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>Entrar na plataforma</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Alternador Mobile no Rodapé -->
+            <div
+                class="md:hidden mt-6 pt-4 border-t border-brand-slate/10 text-center text-xs text-brand-slate/70 font-medium">
+                Não tem uma conta?
+                <button type="button" onclick="setAuthMode('register')"
+                    class="font-bold text-brand-sage hover:underline ml-1">Cadastre-se</button>
+            </div>
+        </div>
+
+        <!-- ── OVERLAY DESLIZANTE COM O MASCOTE LEX ────────────────────────── -->
+        <!-- ── OVERLAY DESLIZANTE COM O MASCOTE LEX ────────────────────────── -->
+<div class="overlay-container">
+    <div class="overlay">
+
+        <!-- Elementos Orgânicos no Fundo do Overlay -->
+        <div class="absolute -top-16 -right-16 w-52 h-52 bg-brand-gold/20 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-52 h-52 bg-brand-sage/25 rounded-full blur-2xl pointer-events-none"></div>
+
+        <!-- Painel Esquerdo do Overlay (visível quando na tela de Cadastro) -->
+        <div class="overlay-panel overlay-left">
+            <div class="mascot-stage" aria-hidden="true">
+                {% if mascot_available %}<img src="{{ url_for('static', filename='img/lex_mascote.png') }}" alt="Mascote da LISE" class="mascot-image">{% else %}<i data-lucide="sprout" class="w-36 h-36 text-white/80 mx-auto" aria-hidden="true"></i>{% endif %}
+            </div>
+
+            <div class="overlay-content-card">
+                <div class="inline-flex bg-white/95 text-brand-dark px-3 py-1 rounded-full text-[11px] font-bold shadow-md items-center gap-1.5 border border-white/80">
+                    <i data-lucide="dna" class="w-3.5 h-3.5 text-brand-sage"></i>
+                    <span>Continue sua evolução!</span>
+                </div>
+                
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight mt-2">
+                    Já é de casa?
+                </h2>
+                
+                <p class="text-xs text-white/90 mt-1 max-w-xs font-medium leading-relaxed">
+                    Conecte-se para continuar suas trilhas e explorar novos radicais!
+                </p>
+
+                <button type="button" id="signIn"
+                    class="mt-4 w-full py-2.5 rounded-xl border-2 border-white/90 text-white hover:bg-white hover:text-brand-dark font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-xl active:scale-95 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>Fazer Login</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Painel Direito do Overlay (visível quando na tela de Login) -->
+        <div class="overlay-panel overlay-right">
+            <div class="mascot-stage" aria-hidden="true">
+                {% if mascot_available %}<img src="{{ url_for('static', filename='img/lex_mascote.png') }}" alt="Mascote da LISE" class="mascot-image">{% else %}<i data-lucide="sprout" class="w-36 h-36 text-white/80 mx-auto" aria-hidden="true"></i>{% endif %}
+            </div>
+
+            <div class="overlay-content-card">
+                <div class="inline-flex bg-white/95 text-brand-dark px-3 py-1 rounded-full text-[11px] font-bold shadow-md items-center gap-1.5 border border-white/80">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+                    <span>Pronto para a jornada?</span>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight mt-2">
+                    Novo por aqui?
+                </h2>
+
+                <p class="text-xs text-white/90 mt-1 max-w-xs font-medium leading-relaxed">
+                    Crie sua conta para desvendar termos biológicos e desafiar seus colegas de turma!
+                </p>
+
+                <button type="button" id="signUp"
+                    class="mt-4 w-full py-2.5 rounded-xl border-2 border-white/90 text-white hover:bg-white hover:text-brand-dark font-bold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-xl active:scale-95 flex items-center justify-center gap-2">
+                    <span>Cadastre-se</span>
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const container = document.getElementById('auth-container');
+    const signUpBtn = document.getElementById('signUp');
+    const signInBtn = document.getElementById('signIn');
+
+    function setAuthMode(mode) {
+        if (!container) return;
+        if (mode === 'register') {
+            container.classList.add("right-panel-active");
+            try {
+                const url = new URL(window.location);
+                url.searchParams.set('mode', 'register');
+                window.history.replaceState({}, '', url);
+            } catch (e) { }
+        } else {
+            container.classList.remove("right-panel-active");
+            try {
+                const url = new URL(window.location);
+                url.searchParams.set('mode', 'login');
+                window.history.replaceState({}, '', url);
+            } catch (e) { }
+        }
+    }
+
+    if (signUpBtn) {
+        signUpBtn.addEventListener('click', () => setAuthMode('register'));
+    }
+
+    if (signInBtn) {
+        signInBtn.addEventListener('click', () => setAuthMode('login'));
+    }
+
+    // Verifica URL query params ou hash ao carregar
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if ({{ mode|tojson }} === 'register' || urlParams.get('mode') === 'register' || window.location.hash === '#register') {
+            setAuthMode('register');
+        }
+    });
+
+    // Alternador de visibilidade de senha
+    function togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (!input || !icon) return;
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            input.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+</script>
+{% endblock %}

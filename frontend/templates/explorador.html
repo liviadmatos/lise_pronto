@@ -1,0 +1,182 @@
+{% extends "base.html" %} {% block title %}Explorador de Termos — Lise{%
+endblock %} {% block content %}
+<div class="animate-slide-in-up space-y-8">
+  <!-- Header -->
+  <div class="relative">
+    <div class="absolute -left-20 -top-20 w-60 h-60 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -right-20 -bottom-20 w-60 h-60 bg-brand-sage/10 rounded-full blur-3xl pointer-events-none">
+    </div>
+
+    <div class="relative z-10">
+      <span
+        class="inline-flex items-center gap-2 bg-brand-sage/10 text-brand-dark px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></span> Dicionário Etimológico
+      </span>
+      <h1 class="text-4xl sm:text-5xl font-serif font-bold text-brand-dark mt-4 flex items-center gap-3">
+        <i data-lucide="search" class="w-10 h-10 text-brand-sage"></i> Explorador de Termos
+      </h1>
+      <p class="text-lg text-brand-slate/70 mt-4 max-w-2xl">
+        Descubra o significado e a etimologia por trás das palavras da Biologia. Explore, aprenda e domine novos termos.
+      </p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <form method="GET" class="card p-6 space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar termo..."
+        class="md:col-span-2 px-4 py-3 border border-brand-slate/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium" />
+      <select name="area"
+        class="px-4 py-3 border border-brand-slate/20 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+        <option value="">Todas as Áreas</option>
+        {% for a in areas %}
+        <option value="{{ a }}" {% if a==area_selecionada %}selected{% endif %}>
+          {{ a }}
+        </option>
+        {% endfor %}
+      </select>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary flex-1">
+          <i data-lucide="filter" class="w-4 h-4"></i> Filtrar
+        </button>
+        {% if busca or area_selecionada %}
+        <a href="{{ url_for('explorador') }}" class="btn-outline flex-1">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+
+  <!-- Contagem e Status -->
+  <div class="flex items-center justify-between px-2">
+    <p class="text-sm text-brand-slate/70">
+      <span class="font-bold text-brand-dark text-base">{{ terms|length }}</span>
+      termo(s) encontrado(s)
+      {% if area_selecionada %}
+      em <span class="font-bold text-brand-sage">{{ area_selecionada }}</span>
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Grid de Cards -->
+  {% if terms %}
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    {% for term in terms %}
+    <div
+      class="card group cursor-pointer hover:border-brand-sage/60 hover:-translate-y-2 hover:shadow-xl transition-all duration-300 relative overflow-hidden border-l-4 border-l-brand-sage"
+      onclick="openModal('{{ term.id }}')">
+      <div
+        class="absolute -right-8 -top-8 w-24 h-24 bg-brand-sage/5 rounded-full group-hover:bg-brand-sage/10 transition-colors">
+      </div>
+
+      <div class="relative z-10">
+        <div class="flex justify-between items-start mb-3">
+          <span class="badge bg-brand-sage/10 text-brand-dark text-xs font-semibold px-3 py-1.5">
+            {{ term.area }}
+          </span>
+          <span class="badge bg-brand-gold/10 text-brand-gold text-xs font-semibold px-3 py-1.5">
+            Nível {{ term.difficulty }}
+          </span>
+        </div>
+        <h3 class="text-xl font-bold text-brand-dark font-serif">
+          {{ term.name }}
+        </h3>
+        <p class="text-sm text-brand-slate/70 mt-3 line-clamp-2 leading-relaxed">
+          {{ term.definition }}
+        </p>
+
+        {% if term.radical_list %}
+        <div class="mt-4 space-y-2">
+          {% for r in term.radical_list %}
+          <div
+            class="bg-brand-cream rounded-lg px-3 py-2 text-xs border border-brand-slate/5 hover:border-brand-sage/20 transition-colors">
+            <span class="font-bold text-brand-sage">{{ r.text }}-</span>
+            <span class="text-brand-slate/70">{{ r.meaning }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="mt-4 pt-3 border-t border-brand-slate/10 flex justify-between items-center">
+          <span class="text-xs text-brand-slate/50 font-medium">
+            <i data-lucide="layers" class="w-3.5 h-3.5 inline mr-1"></i> {{ term.radical_list|length }} radical(is)
+          </span>
+          <span
+            class="text-xs text-brand-sage font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+            Ver detalhes <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-16">
+    <div class="text-6xl mb-4 opacity-50">🔎</div>
+    <p class="font-bold text-2xl text-brand-dark mb-2">Nenhum termo encontrado.</p>
+    <p class="text-brand-slate/70">Tente ajustar seus filtros de busca.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── Modal de Detalhes ─────────────────────────────────────────────── -->
+<div id="termModal" class="fixed inset-0 bg-black/50 backdrop-blur-md z-50 hidden flex items-center justify-center p-4"
+  onclick="if (event.target === this) closeModal();">
+  <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 animate-fade-in relative overflow-hidden">
+    <div class="absolute -right-16 -top-16 w-48 h-48 bg-brand-sage/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative z-10">
+      <div class="flex justify-between items-start mb-6">
+        <div>
+          <span id="modalArea"
+            class="badge bg-brand-sage/10 text-brand-dark mb-3 text-xs font-semibold px-3 py-1.5"></span>
+          <h2 id="modalName" class="text-3xl font-serif font-bold text-brand-dark"></h2>
+        </div>
+        <button onclick="closeModal()"
+          class="text-brand-slate/40 hover:text-brand-slate transition-colors text-2xl leading-none">
+          ✕
+        </button>
+      </div>
+      <p id="modalDef" class="text-brand-slate/80 text-base leading-relaxed mb-6"></p>
+      <div id="modalRadicals" class="space-y-3 mb-6"></div>
+      <a id="modalPlay" href="#"
+        class="btn-primary w-full text-center block py-3 font-bold flex items-center justify-center gap-2">
+        <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+        Praticar este Termo
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Dados JSON para modal -->
+<script>
+  const termsData = {{ terms_data|tojson }};
+  function openModal(id) {
+    const t = termsData[id];
+    if (!t) return;
+    document.getElementById('modalName').textContent = t.name;
+    document.getElementById('modalArea').textContent = t.area;
+    document.getElementById('modalDef').textContent = t.definition;
+    const rEl = document.getElementById('modalRadicals');
+    rEl.replaceChildren();
+    for (const r of t.radical_list) {
+      const row = document.createElement('p');
+      row.className = 'p-3 bg-brand-cream rounded-lg';
+      row.textContent = `${r.type}: ${r.text} — ${r.meaning}`;
+      rEl.appendChild(row);
+    }
+    const gameUrl = new URL({{ url_for('montagem')|tojson }}, window.location.origin);
+    gameUrl.searchParams.set('termo_id', id);
+    document.getElementById('modalPlay').href = gameUrl.href;
+    document.getElementById('termModal').classList.remove('hidden');
+    document.getElementById('termModal').classList.add('flex');
+  }
+  function closeModal() {
+    document.getElementById('termModal').classList.add('hidden');
+    document.getElementById('termModal').classList.remove('flex');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+{% endblock %}

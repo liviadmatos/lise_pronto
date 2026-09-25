@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Turma {{ turma.name }} — Lise{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in-up space-y-8">
+
+    <!-- ── Botão Voltar ─────────────────────────────────────────────────── -->
+    <a href="{{ url_for('dashboard') }}"
+        class="inline-flex items-center gap-2 text-gray-500 hover:text-petroleo transition-colors font-medium text-sm bg-white/50 px-3 py-1.5 rounded-full border border-gray-200 shadow-sm backdrop-blur-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Voltar ao Dashboard
+    </a>
+
+    <!-- ── Header da Turma ──────────────────────────────────────────────── -->
+    <div class="card p-8 bg-gradient-to-br from-white to-bege/30 relative overflow-hidden">
+        <!-- Decorador -->
+        <div class="absolute right-0 top-0 w-64 h-full bg-musgo/5 blur-3xl rounded-full"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <h1 class="font-serif text-3xl font-bold text-petroleo">{{ turma.name }}</h1>
+                    <span
+                        class="badge bg-musgo/10 text-musgo text-sm font-mono tracking-widest border border-musgo/20 px-3 py-1.5 cursor-help"
+                        title="Código de Convite da Turma">
+                        {{ turma.code }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-500 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-salvia" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Criada em {{ turma.created_at[:10] if turma.created_at else 'Data desconhecida' }}
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
+                <div class="bg-white rounded-2xl px-5 py-3 border border-gray-100 shadow-sm text-center min-w-[120px]">
+                    <p class="text-3xl font-bold text-petroleo">{{ alunos_dados|length }}</p>
+                    <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">Alunos Matriculados</p>
+                </div>
+                <div class="bg-white rounded-2xl px-5 py-3 border border-gray-100 shadow-sm text-center min-w-[120px]">
+                    <p class="text-3xl font-bold text-musgo">{{ turma.trilhas|length if turma.trilhas else 0 }}</p>
+                    <p class="text-[10px] uppercase font-bold text-gray-400 mt-1">Trilhas Atribuídas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Lista de Alunos e Desempenho ─────────────────────────────────── -->
+    <div class="card p-0 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h2 class="font-serif text-xl font-bold text-petroleo flex items-center gap-2">
+                <svg class="w-5 h-5 text-salvia" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Desempenho dos Alunos
+            </h2>
+            <div class="text-xs text-gray-500 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+                Rankeado por XP na turma
+            </div>
+        </div>
+
+        {% if alunos_dados %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr
+                        class="bg-gray-50/80 border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500 font-semibold">
+                        <th class="p-4 pl-6 w-10 text-center">#</th>
+                        <th class="p-4">Aluno</th>
+                        <th class="p-4 text-center">Classificação (Tier)</th>
+                        <th class="p-4 text-center">Engajamento</th>
+                        <th class="p-4 text-right pr-6">Última Atividade</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for aluno in alunos_dados %}
+                    <tr class="hover:bg-gray-50/50 transition-colors group">
+                        <td class="p-4 pl-6 text-center text-gray-400 font-medium text-sm">
+                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else
+                            %}{{ loop.index }}{% endif %}
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-gradient-to-br from-salvia to-musgo text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                                    {{ (aluno.name[0]|upper) if aluno.name else '' }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-petroleo text-sm group-hover:text-musgo transition-colors">
+                                        {{ aluno.name }}</p>
+                                    <p class="text-xs text-gray-400">{{ aluno.email }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="inline-flex flex-col items-center justify-center">
+                                <span class="text-xl mb-0.5 filter drop-shadow-sm">{{ aluno.tier.split(' ')[0] if ' ' in
+                                    (aluno.tier or '') else (aluno.tier or '') }}</span> <!-- Mostra o ícone do tier -->
+                                <span class="text-xs font-bold text-petroleo">{{ aluno.tier.split(' ')[1] if ' ' in
+                                    (aluno.tier or '') else (aluno.tier or '') }}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">Nível {{ aluno.nivel }}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex justify-center gap-4">
+                                <div class="text-center">
+                                    <p class="text-sm font-bold text-dourado">{{ aluno.xp or 0 }}</p>
+                                    <p class="text-[9px] uppercase text-gray-400 font-bold">XP na turma</p>
+                                </div>
+                                <div class="w-px bg-gray-200"></div>
+                                <div class="text-center">
+                                    <p class="text-sm font-bold text-petroleo">{{ aluno.jogadas or 0 }}</p>
+                                    <p class="text-[9px] uppercase text-gray-400 font-bold">Jogadas</p>
+                                </div>
+                                <div class="w-px bg-gray-200"></div>
+                                <div class="text-center">
+                                    <p class="text-sm font-bold text-orange-400 flex items-center gap-1"><span
+                                            data-lucide="flame" style="width: 1rem; height: 1rem;"></span> {{
+                                        aluno.streak or 0 }}</p>
+                                    <p class="text-[9px] uppercase text-gray-400 font-bold">Streak</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 pr-6 text-right text-xs text-gray-500">
+                            {% if aluno.last_activity != 'Nunca' %}
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 text-green-700 border border-green-100">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                {{ aluno.last_activity }}
+                            </span>
+                            {% else %}
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 text-gray-500 border border-gray-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                Inativo
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="text-4xl mb-3 opacity-30">📭</div>
+            <p class="text-gray-500 font-medium">Nenhum aluno entrou nesta turma ainda.</p>
+            <p class="text-sm text-gray-400 mt-1">Compartilhe o código <strong
+                    class="text-petroleo border-b border-dashed border-petroleo">{{ turma.code }}</strong> com eles.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── Trilhas Atribuídas à Turma ───────────────────────────────────── -->
+    <div class="card p-0 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h2 class="font-serif text-xl font-bold text-petroleo flex items-center gap-2">
+                <svg class="w-5 h-5 text-musgo" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Trilhas Atribuídas
+            </h2>
+            <form action="{{ url_for('vincular_trilha', turma_id=turma.id) }}" method="POST"
+                class="flex gap-2 items-center">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="trilha_id" required
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-musgo/30 bg-white">
+                    <option value="">-- Atribuir Nova Trilha --</option>
+                    {% for t in professor_trilhas %}
+                    {% if not turma.trilhas or t.id not in turma.trilhas %}
+                    <option value="{{ t.id }}">{{ t.name }} ({{ t.area }})</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-primary py-1.5 px-4 text-xs">Vincular</button>
+            </form>
+        </div>
+
+        {% if turma.trilhas %}
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for t_id in turma.trilhas %}
+            {% for t in professor_trilhas if t.id == t_id %}
+            <div
+                class="border border-salvia/30 rounded-xl p-4 bg-white hover:shadow-md transition-shadow relative overflow-hidden group">
+                <div
+                    class="absolute right-0 top-0 w-16 h-16 bg-gradient-to-bl from-salvia/10 to-transparent rounded-bl-full">
+                </div>
+                <span class="badge bg-salvia/10 text-salvia mb-2 text-[10px] uppercase">{{ t.area }}</span>
+                <h3 class="font-bold text-petroleo text-md">{{ t.name }}</h3>
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2 h-8">{{ t.description }}</p>
+                <div
+                    class="mt-4 flex justify-between items-center text-xs font-medium text-gray-400 border-t border-gray-100 pt-3">
+                    <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg> {{ t.terms|length if t.terms else 0 }} Termos</span>
+                    <span class="text-salvia bg-salvia/10 px-2 py-0.5 rounded text-[10px] font-bold">Ativa na
+                        turma</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-10 bg-gray-50/30">
+            <p class="text-gray-500 text-sm">Nenhuma trilha vinculada a esta turma.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

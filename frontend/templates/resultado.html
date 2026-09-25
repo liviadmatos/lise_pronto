@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Resultado — LISE{% endblock %}
+{% block content %}
+<div class="card max-w-2xl mx-auto text-center space-y-6 p-10">
+  <span class="text-5xl">{% if partida.correto %}🌿{% else %}📖{% endif %}</span>
+  <h1 class="font-serif text-3xl text-brand-dark">{% if partida.jogo == 'flashcard' %}Revisão registrada{% elif partida.correto %}Resposta correta!{% else %}Vamos aprender com esta tentativa{% endif %}</h1>
+  <h2 class="text-2xl font-bold">{{ term.name }}</h2>
+  <p>{{ term.definition }}</p>
+  <div class="flex flex-wrap gap-2 justify-center">{% for r in term.radical_list %}<span class="rounded-lg bg-brand-cream p-3"><strong>{{ r.text }}</strong><br><small>{{ r.meaning }}</small></span>{% endfor %}</div>
+  {% if partida.xp %}<p class="text-brand-gold font-bold text-xl">+{{ partida.xp }} XP</p>{% elif partida.correto %}<p class="text-sm">Você já recebeu os pontos deste termo neste jogo hoje. Pode continuar praticando!</p>{% endif %}
+  {% if partida.novo_flashcard %}<p class="p-4 bg-brand-sage/20 rounded-xl">Novo flashcard desbloqueado!</p>{% endif %}
+  {% if partida.jogo == 'flashcard' %}<p>Próxima revisão em {% if partida.correto %}3 dias{% else %}1 hora{% endif %}.</p>{% endif %}
+  <div class="flex justify-center flex-wrap gap-3"><a class="btn-primary" href="{{ next_url }}">Continuar</a><a class="btn-outline" href="{{ url_for('index') }}">Início</a></div>
+</div>
+{% endblock %}

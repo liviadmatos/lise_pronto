@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}Dashboard do Professor — Lise{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in-up space-y-8">
+
+    <!-- ── Header do Dashboard ──────────────────────────────────────────── -->
+    <div
+        class="bg-gradient-to-r from-brand-dark to-brand-slate rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-2xl shadow-brand-dark/20">
+        <!-- Decorador de Fundo -->
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-56 h-56 bg-brand-sage/10 rounded-full blur-3xl pointer-events-none">
+        </div>
+
+        <div class="relative z-10">
+            <span
+                class="inline-flex items-center gap-2 bg-white/10 text-brand-gold px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></span> Visão Geral
+            </span>
+            <h1 class="font-serif text-4xl sm:text-5xl font-bold mt-4">Painel do Professor</h1>
+            <p class="text-brand-cream/90 mt-4 max-w-xl leading-relaxed">
+                Acompanhe o engajamento e o aprendizado das suas turmas ao acessar o painel. Crie trilhas personalizadas para
+                focar nas necessidades dos alunos.
+            </p>
+
+            <div class="flex gap-4 mt-8 flex-wrap">
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/10 text-center flex flex-col justify-center min-w-[140px] hover:bg-white/15 transition-colors">
+                    <p class="text-3xl font-bold text-brand-sage">{{ turmas|length }}</p>
+                    <p class="text-xs text-white/70 mt-2 uppercase tracking-wider font-semibold">Turmas Ativas</p>
+                </div>
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/10 text-center flex flex-col justify-center min-w-[140px] hover:bg-white/15 transition-colors">
+                    <p class="text-3xl font-bold text-brand-gold">{{ trilhas|length }}</p>
+                    <p class="text-xs text-white/70 mt-2 uppercase tracking-wider font-semibold">Trilhas Criadas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn-primary" href="{{ url_for('novo_termo') }}">Adicionar termo para minhas turmas</a>
+<!-- ── Layout Dividido (Turmas e Trilhas) ───────────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Coluna de Turmas -->
+        <div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="font-serif text-3xl font-bold text-brand-dark flex items-center gap-3">
+                    <i data-lucide="users" class="w-8 h-8 text-brand-sage"></i> Minhas Turmas
+                </h2>
+                <button data-open-modal="modalTurma"
+                    class="btn-primary text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Nova Turma
+                </button>
+            </div>
+
+            {% if turmas %}
+            <div class="grid grid-cols-1 gap-4">
+                {% for turma in turmas %}
+                <!-- Card de Turma -->
+                <a href="{{ url_for('ver_turma', turma_id=turma.id) }}"
+                    class="card block hover:border-brand-sage/60 hover:-translate-y-2 hover:shadow-xl group relative overflow-hidden border-l-4 border-l-brand-sage transition-all duration-300">
+                    <div
+                        class="absolute -right-10 -top-10 w-32 h-32 bg-brand-sage/10 rounded-full group-hover:bg-brand-sage/15 transition-colors pointer-events-none">
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-brand-dark text-lg font-serif">{{ turma.name }}</h3>
+                                <p class="text-xs text-brand-slate/60 mt-1">Criada em {{
+                                    turma.created_at if turma.created_at else 'Recentemente' }}</p>
+                            </div>
+                            <span
+                                class="badge bg-brand-gold/10 text-brand-gold font-mono text-xs border border-brand-gold/20 px-3 py-1.5">{{
+                                turma.code }}</span>
+                        </div>
+                        <div class="mt-auto space-y-3">
+                            <div class="flex items-center text-sm text-brand-slate/70 gap-2">
+                                <i data-lucide="user" class="w-4 h-4 text-brand-sage"></i>
+                                <span><strong>{{ turma.alunos|length if turma.alunos else 0 }}</strong> aluno(s)</span>
+                            </div>
+                            <div class="flex items-center text-sm text-brand-slate/70 gap-2">
+                                <i data-lucide="map" class="w-4 h-4 text-brand-sage"></i>
+                                <span><strong>{{ turma.trilhas|length if turma.trilhas else 0 }}</strong>
+                                    trilha(s)</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-brand-slate/10 text-right">
+                            <span
+                                class="text-sm font-semibold text-brand-sage flex items-center justify-end gap-1 group-hover:translate-x-1 transition-transform">
+                                Ver Detalhes <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty state Turma -->
+            <div
+                class="card text-center py-16 border-dashed border-2 border-brand-slate/20 flex flex-col items-center justify-center">
+                <i data-lucide="users" class="w-16 h-16 text-brand-slate/30 mb-4"></i>
+                <h4 class="font-bold text-brand-dark text-lg">Você não tem turmas</h4>
+                <p class="text-brand-slate/70 text-sm mt-2 max-w-xs">Comece criando uma turma para compartilhar o código
+                    com seus alunos.</p>
+                <button data-open-modal="modalTurma"
+                    class="btn-primary mt-6">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Criar primeira turma
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Coluna de Trilhas -->
+        <div class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="font-serif text-3xl font-bold text-brand-dark flex items-center gap-3">
+                    <i data-lucide="map" class="w-8 h-8 text-brand-gold"></i> Minhas Trilhas
+                </h2>
+                <button data-open-modal="modalTrilha"
+                    class="btn-primary text-sm">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Nova Trilha
+                </button>
+            </div>
+
+            {% if trilhas %}
+            <div class="grid grid-cols-1 gap-4">
+                {% for trilha in trilhas %}
+                <div
+                    class="card flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-brand-gold/60 hover:-translate-y-2 hover:shadow-xl group relative overflow-hidden border-l-4 border-l-brand-gold transition-all duration-300">
+                    <div
+                        class="absolute -right-10 -top-10 w-32 h-32 bg-brand-gold/10 rounded-full group-hover:bg-brand-gold/15 transition-colors pointer-events-none">
+                    </div>
+                    <div class="relative z-10 flex-1 min-w-0">
+                        <span
+                            class="badge bg-brand-gold/10 text-brand-gold mb-2 border border-brand-gold/20 text-xs font-semibold px-3 py-1.5">{{
+                            trilha.area }}</span>
+                        <h3 class="font-bold text-brand-dark text-lg font-serif truncate">{{ trilha.name }}</h3>
+                        <p class="text-sm text-brand-slate/70 mt-2 line-clamp-2">{{ trilha.description or 'Sem
+                            descrição' }}</p>
+                    </div>
+                    <div class="flex items-center gap-4 w-full sm:w-auto">
+                        <div
+                            class="bg-brand-gold/10 rounded-xl px-5 py-3 border border-brand-gold/20 text-center min-w-[100px] hover:bg-brand-gold/15 transition-colors">
+                            <p class="text-2xl font-bold text-brand-gold">{{ trilha.terms|length if trilha.terms else 0
+                                }}</p>
+                            <p class="text-[11px] uppercase font-bold text-brand-slate/60">Termos</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty state Trilha -->
+            <div
+                class="card text-center py-16 border-dashed border-2 border-brand-slate/20 flex flex-col items-center justify-center">
+                <i data-lucide="map" class="w-16 h-16 text-brand-slate/30 mb-4"></i>
+                <h4 class="font-bold text-brand-dark text-lg">Banco de trilhas vazio</h4>
+                <p class="text-brand-slate/70 text-sm mt-2 max-w-xs">Monte trilhas de aprendizagem selecionando termos
+                    biológicos.</p>
+                <button data-open-modal="modalTrilha"
+                    class="btn-primary mt-6">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Criar primeira trilha
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── Modais de Criação ────────────────────────────────────────────────── -->
+
+<!-- Modal: Nova Turma -->
+<div id="modalTurma"
+    class="hidden fixed inset-0 bg-brand-dark/60 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity"
+    onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto animate-fade-in relative overflow-hidden">
+        <div class="absolute -right-20 -top-20 w-48 h-48 bg-brand-sage/10 rounded-full blur-3xl pointer-events-none">
+        </div>
+        <button onclick="document.getElementById('modalTurma').classList.add('hidden')"
+            class="absolute top-6 right-6 text-brand-slate/40 hover:text-brand-slate bg-brand-cream rounded-full p-2 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="relative z-10">
+            <h2 class="font-serif text-2xl font-bold text-brand-dark mb-2">Criar Nova Turma</h2>
+            <p class="text-sm text-brand-slate/70 mb-6">Um código de convite único será gerado automaticamente após a
+                criação.</p>
+
+            <form action="{{ url_for('criar_turma') }}" method="POST" class="space-y-5">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div>
+                    <label class="block text-sm font-semibold text-brand-dark mb-2.5">Nome da Turma</label>
+                    <input type="text" name="name" required placeholder="Ex: Bio 3º Ano - Manhã"
+                        class="w-full px-4 py-3 border border-brand-slate/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage bg-white transition-all font-medium">
+                </div>
+                <div class="pt-3">
+                    <button type="submit" class="btn-primary w-full py-3 text-base font-bold">Criar Turma</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+    <!-- Modal: Nova Trilha -->
+    <div id="modalTrilha"
+        class="hidden fixed inset-0 bg-brand-dark/60 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity"
+        onclick="if(event.target===this)this.classList.add('hidden')">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 max-h-[90vh] overflow-y-auto animate-fade-in relative overflow-hidden">
+            <div
+                class="absolute -right-20 -top-20 w-48 h-48 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none">
+            </div>
+            <button onclick="document.getElementById('modalTrilha').classList.add('hidden')"
+                class="absolute top-6 right-6 text-brand-slate/40 hover:text-brand-slate bg-brand-cream rounded-full p-2 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="relative z-10">
+                <h2 class="font-serif text-2xl font-bold text-brand-dark mb-2">Criar Nova Trilha</h2>
+                <p class="text-sm text-brand-slate/70 mb-6">Crie uma sequência de aprendizado personalizada para suas
+                    turmas.</p>
+
+                <form action="{{ url_for('criar_trilha') }}" method="POST" class="space-y-5">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div>
+                        <label class="block text-sm font-semibold text-brand-dark mb-2.5">Nome da Trilha</label>
+                        <input type="text" name="name" required placeholder="Ex: Dominando a Citologia"
+                            class="w-full px-4 py-3 border border-brand-slate/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage bg-white transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-brand-dark mb-2.5">Área Temática</label>
+                        <select name="area"
+                            class="w-full px-4 py-3 border border-brand-slate/20 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                            <option value="">Todas as Áreas</option>
+                            {% for a in areas %}<option>{{ a }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="termos" class="block text-sm font-semibold text-brand-dark mb-2">Termos da trilha</label>
+<select id="termos" name="termos" multiple required size="6" class="w-full border rounded-lg p-2">
+{% for t in termos_disponiveis if t.radical_list %}<option value="{{ t.id }}">{{ t.name }} — {{ t.area }}{% if t.private %} (particular){% endif %}</option>{% endfor %}
+</select><p class="text-xs my-2">Use Ctrl (Windows) ou ⌘ (Mac) para selecionar vários termos. Ao atribuir a trilha, seus termos particulares ficam disponíveis à turma escolhida.</p>
+</div><div><label class="block text-sm font-semibold text-brand-dark mb-2.5">Descrição (opcional)</label>
+                        <textarea name="description" rows="2" placeholder="O que o aluno vai aprender?"
+                            class="w-full px-4 py-3 border border-brand-slate/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage bg-white transition-all font-medium resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-brand-dark mb-2.5">Atribuir à Turma
+                            (opcional)</label>
+                        <select name="turma_id"
+                            class="w-full px-4 py-3 border border-brand-slate/20 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-sage/30 focus:border-brand-sage font-medium">
+                            <option value="">Atribuir a uma turma depois</option>
+                            {% for turma in turmas %}
+                            <option value="{{ turma.id }}">{{ turma.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pt-3">
+                        <button type="submit" class="btn-primary w-full py-3 text-base font-bold">Criar Trilha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endblock %}{% block scripts %}
+<script>
+document.querySelectorAll('[data-open-modal]').forEach(function (button) {
+  button.addEventListener('click', function () {
+    const modal = document.getElementById(button.dataset.openModal);
+    if (modal) modal.classList.remove('hidden');
+  });
+});
+</script>
+{% endblock %}

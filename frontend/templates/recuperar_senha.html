@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card max-w-md mx-auto my-12 space-y-5"><h1 class="font-serif text-3xl text-brand-dark">Recuperar senha</h1><p>Receba um link para escolher uma nova senha.</p><form method="POST" class="space-y-4"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label class="block">E-mail<input name="email" type="email" required maxlength="255" class="w-full border rounded-lg p-3" autocomplete="email"></label><button class="btn-primary">Enviar link</button></form><a href="{{ url_for('login') }}" class="block underline">Voltar ao login</a></div>
+{% endblock %}

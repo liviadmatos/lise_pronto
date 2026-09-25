@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full bg-brand-cream scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Lise — Etimologia em Foco{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..800;1,8..60,400..800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="{{ url_for('static', filename='js/lucide.min.js') }}" defer></script>
+  
+
+
+
+  <style>
+    /* Componentes Base */
+    .card {
+      background-color: #ffffff;
+      border: 1px solid rgba(70, 90, 101, 0.08);
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 15px -3px rgba(74, 93, 78, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 1.5rem;
+    }
+
+    .card:hover {
+      box-shadow: 0 20px 25px -5px rgba(74, 93, 78, 0.12);
+      border-color: rgba(141, 170, 145, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background-color: #4a5d4e;
+      color: #f9f7f2;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background-color: #3d4d40;
+      box-shadow: 0 10px 15px -3px rgba(74, 93, 78, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: #8daa91;
+      color: #f9f7f2;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: #7ba180;
+      box-shadow: 0 10px 15px -3px rgba(141, 170, 145, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: #4a5d4e;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      border: 1.5px solid rgba(74, 93, 78, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-outline:hover {
+      background-color: #ffffff;
+      border-color: #4a5d4e;
+      box-shadow: 0 10px 15px -3px rgba(74, 93, 78, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .brand-text {
+      background: linear-gradient(135deg, #4A5D4E 0%, #8DAA91 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+
+{% set show_header_endpoints = [
+'home',
+'index',
+'dashboard',
+'jogos',
+'decifrador',
+'flashcard',
+'montagem',
+'explorador', 'ver_turma', 'novo_termo', 'resultado'
+] %}
+
+{% set show_footer_endpoints = [
+'home',
+'index',
+'dashboard'
+] %}
+
+{% set current_ep = request.endpoint %}
+{% set show_header = current_ep in show_header_endpoints %}
+{% set show_footer = current_ep in show_footer_endpoints %}
+
+<body class="h-full font-sans text-brand-slate flex flex-col bg-brand-cream scroll-smooth relative overflow-x-hidden">
+
+  {% if show_header %}
+  <!-- Botão Gatilho Fixo da Logo (Canto Superior Esquerdo) -->
+  <div class="fixed top-5 left-6 z-40">
+    <button id="toggle-sidebar"
+      class="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-brand-slate/10 shadow-md hover:shadow-lg transition-all group">
+      <i data-lucide="dna" class="onclick:animate-spin w-6 h-6 text-brand-dark group-hover:text-brand-sage transition-colors"></i>
+      <span class="font-bold text-xl text-brand-dark tracking-wide font-serif">Lise</span>
+      <i data-lucide="chevron-right" id="icon-chevron"
+        class="w-4 h-4 text-brand-slate transition-transform duration-300"></i>
+    </button>
+  </div>
+
+  <!-- Backdrop escuro para fechar a sidebar ao clicar fora -->
+  <div id="sidebar-backdrop"
+    class="fixed inset-0 bg-brand-petroleo/30 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0">
+  </div>
+
+  <!-- Header / Sidebar Lateral Retrátil -->
+  <aside id="sidebar-principal"
+    class="fixed top-0 left-0 h-full w-72 bg-white/95 backdrop-blur-md z-50 transform -translate-x-full transition-transform duration-300 ease-in-out border-r border-brand-slate/10 shadow-2xl flex flex-col justify-between p-6">
+    <div>
+      <!-- Topo da Sidebar: Logo e Botão de Fechar -->
+      <div class="flex items-center justify-between pb-6 border-b border-brand-cream">
+        {% set logo_link = url_for('dashboard') if (is_professor or session.get('is_professor') or (current_user is defined and current_user and current_user.is_professor)) else url_for('home') %}
+        <a href="{{ logo_link }}" class="flex items-center gap-3">
+          <i data-lucide="dna" class="w-8 h-8 text-brand-dark"></i>
+          <span class="font-bold text-2xl text-brand-dark tracking-wide font-serif">Lise</span>
+        </a>
+        <button id="close-sidebar"
+          class="p-2 text-brand-slate hover:text-brand-dark rounded-xl hover:bg-brand-cream transition">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Links de Navegação Principal -->
+      <nav class="mt-8 space-y-2">
+        {% if not (is_professor or session.get('is_professor') or (current_user is defined and current_user and current_user.is_professor)) %}
+        <a href="{{ url_for('home') }}"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-slate hover:text-brand-dark hover:bg-brand-cream transition-all {% if current_ep == 'home' %}bg-brand-cream text-brand-dark font-semibold{% endif %}">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-brand-sage"></i>
+          Home
+        </a>
+
+        <a href="{{ url_for('jogos') }}"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-slate hover:text-brand-dark hover:bg-brand-cream transition-all {% if current_ep in ['jogos', 'decifrador', 'flashcard', 'montagem'] %}bg-brand-cream text-brand-dark font-semibold{% endif %}">
+          <i data-lucide="gamepad-2" class="w-5 h-5 text-brand-sage"></i>
+          Minijogos
+        </a>
+        {% endif %}
+
+        <a href="{{ url_for('explorador') }}"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-slate hover:text-brand-dark hover:bg-brand-cream transition-all {% if current_ep == 'explorador' %}bg-brand-cream text-brand-dark font-semibold{% endif %}">
+          <i data-lucide="compass" class="w-5 h-5 text-brand-sage"></i>
+          Explorador
+        </a>
+
+        {% if is_professor or session.get('is_professor') or (current_user is defined and current_user and current_user.is_professor) %}
+        <a href="{{ url_for('dashboard') }}"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-brand-slate hover:text-brand-dark hover:bg-brand-cream transition-all {% if current_ep == 'dashboard' %}bg-brand-cream text-brand-dark font-semibold{% endif %}">
+          <i data-lucide="graduation-cap" class="w-5 h-5 text-brand-gold"></i>
+          Área do Professor
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+
+    <!-- Rodapé da Sidebar (Usuário e Logout) -->
+    <div class="pt-6 border-t border-brand-cream">
+      {% if current_user is defined and current_user.is_authenticated %}
+      <form action="{{ url_for('logout') }}" method="POST"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit"
+        class="flex items-center justify-center gap-2 btn-secondary w-full text-sm py-3">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+        Sair da Conta
+      </button></form>
+      {% endif %}
+    </div>
+  </aside>
+  {% endif %}
+
+  <!-- Conteúdo Principal Flexível -->
+  <main
+    class="grow w-full {% if not full_width %}max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 {% if show_header %}pt-24{% else %}pt-8{% endif %} pb-6{% endif %}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-6 space-y-2 max-w-4xl mx-auto">
+          {% for category, message in messages %}
+            <div class="p-4 rounded-2xl text-sm font-medium flex items-center gap-3 shadow-sm transition-all
+              {% if category in ['error', 'danger'] %}
+                bg-red-50 text-red-800 border border-red-200
+              {% elif category == 'warning' %}
+                bg-amber-50 text-amber-800 border border-amber-200
+              {% elif category == 'success' %}
+                bg-emerald-50 text-emerald-800 border border-emerald-200
+              {% else %}
+                bg-white text-brand-dark border border-brand-slate/15
+              {% endif %}">
+              <i data-lucide="info" class="w-5 h-5 shrink-0 text-brand-sage"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% if demo_mode %}<p class="text-center text-sm p-3 text-brand-dark">Demonstração local — dados fictícios.</p>{% endif %}{% block content %}{% endblock %}
+  </main>
+
+  {% if show_footer %}
+  <footer class="bg-brand-cream border-t border-brand-slate/10 py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('index') if 'index' in show_header_endpoints else '#' }}"
+          class="flex items-center gap-2 hover:opacity-80 transition-opacity group">
+          <i data-lucide="dna" class="w-5 h-5 text-brand-dark/60 group-hover:text-brand-sage transition-colors"></i>
+          <span class="font-bold text-base text-brand-dark font-serif">Lise</span>
+        </a>
+        <span class="text-brand-slate/20">|</span>
+        <span class="text-brand-slate/60 text-xs">Aprenda biologia desvendando palavras</span>
+      </div>
+      <p class="text-brand-slate/60 text-xs">
+        &copy; 2026 Lise Platform. Desenvolvido por Bit Bang Theory.
+      </p>
+    </div>
+  </footer>
+  {% endif %}
+
+  {% block scripts %}{% endblock %}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      if (window.lucide) lucide.createIcons();
+
+      // Controle do Menu Sidebar Retrátil
+      const toggleBtn = document.getElementById('toggle-sidebar');
+      const closeBtn = document.getElementById('close-sidebar');
+      const sidebar = document.getElementById('sidebar-principal');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const iconChevron = document.getElementById('icon-chevron');
+
+      function openSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+        setTimeout(() => backdrop.classList.add('opacity-100'), 10);
+        if (iconChevron) iconChevron.classList.add('rotate-180');
+      }
+
+      function closeSidebar() {
+        if (!sidebar) return;
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.remove('opacity-100');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+        if (iconChevron) iconChevron.classList.remove('rotate-180');
+      }
+
+      if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+      if (backdrop) backdrop.addEventListener('click', closeSidebar);
+    });
+
+  </script>
+</body>
+</html>

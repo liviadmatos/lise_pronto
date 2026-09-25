@@ -1,0 +1,12 @@
+{
+  "name": "lise-flask-assets",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.cjs -i static/source.css -o static/app.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17",
+    "lucide": "0.468.0"
+  }
+}
